@@ -342,6 +342,9 @@ module.exports = function(webpackEnv) {
         // It's important to do this before Babel processes the JS.
         {
           test: /\.(js|mjs|jsx|ts|tsx)$/,
+          resolve: {
+            symlinks: false,
+          },
           enforce: 'pre',
           use: [
             {
@@ -401,6 +404,9 @@ module.exports = function(webpackEnv) {
             {
               test: /\.(js|mjs|jsx|ts|tsx)$/,
               include: paths.appSrc,
+              resolve: {
+                symlinks: false,
+              },
               loader: require.resolve('babel-loader'),
               options: {
                 customize: require.resolve(
@@ -573,6 +579,16 @@ module.exports = function(webpackEnv) {
             // ** STOP ** Are you adding a new loader?
             // Make sure to add the new loader(s) before the "file" loader.
           ],
+        },
+        // Run .js files under modules/ through a custom loader that will detect legacy-style
+        // MagicMirror modules and convert them into compatible react components.
+        {
+          test: /\.js$/,
+          resolve: {
+            symlinks: true,
+          },
+          include: path.join(paths.appPath, 'modules'),
+          loader: require.resolve('mm/legacy-loader'),
         },
       ],
     },
