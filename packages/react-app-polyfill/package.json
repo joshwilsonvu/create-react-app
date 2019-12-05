@@ -1,7 +1,7 @@
 {
   "name": "react-app-polyfill",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Polyfills for various browsers including commonly used language features",
   "repository": {
     "type": "git",
