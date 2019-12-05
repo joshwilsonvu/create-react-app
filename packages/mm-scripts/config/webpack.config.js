@@ -312,6 +312,9 @@ module.exports = function(webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
+        // MagicMirror: allow imports from "config" and "modules" without relative paths
+        config: path.join(paths.appPath, 'config'),
+        modules: path.join(paths.appPath, 'modules'),
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -322,7 +325,14 @@ module.exports = function(webpackEnv) {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+        new ModuleScopePlugin(
+          [
+            paths.appSrc,
+            path.join(paths.appPath, 'config'),
+            path.join(paths.appPath, 'modules'),
+          ],
+          [paths.appPackageJson]
+        ),
       ],
     },
     resolveLoader: {
@@ -588,7 +598,8 @@ module.exports = function(webpackEnv) {
             symlinks: true,
           },
           include: path.join(paths.appPath, 'modules'),
-          loader: require.resolve('mm/legacy-loader'),
+          exclude: /node_modules/,
+          loader: require.resolve('magicmirrorx/legacy-loader'),
         },
       ],
     },
