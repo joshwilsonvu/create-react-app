@@ -32,6 +32,7 @@ const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
 // @remove-on-eject-begin
 const eslint = require('eslint');
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
@@ -313,8 +314,8 @@ module.exports = function(webpackEnv) {
         }),
         ...(modules.webpackAliases || {}),
         // MagicMirror: allow imports from "config" and "modules" without relative paths
-        config: path.join(paths.appPath, 'config'),
-        modules: path.join(paths.appPath, 'modules'),
+        config: paths.appConfig,
+        modules: paths.appModules,
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -326,13 +327,16 @@ module.exports = function(webpackEnv) {
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
         new ModuleScopePlugin(
-          [
-            paths.appSrc,
-            path.join(paths.appPath, 'config'),
-            path.join(paths.appPath, 'modules'),
-          ],
+          [paths.appSrc, paths.appConfig, paths.appModules],
           [paths.appPackageJson]
         ),
+        // MagicMirror: Lets Webpack find MM modules, which are named the same as their containing
+        // directory.
+        new DirectoryNamedWebpackPlugin({
+          honorIndex: true,
+          exclude: /node_modules/,
+          include: [paths.appModules, paths.appConfig],
+        }),
       ],
     },
     resolveLoader: {
@@ -599,7 +603,7 @@ module.exports = function(webpackEnv) {
           },
           include: path.join(paths.appPath, 'modules'),
           exclude: /node_modules/,
-          loader: require.resolve('magicmirrorx/legacy-loader'),
+          loader: require.resolve('mm-utils/legacy-loader'),
         },
       ],
     },

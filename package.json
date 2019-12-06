@@ -56,5 +56,8 @@
     "yarn.lock": [
       "git rm --cached"
     ]
+  },
+  "dependencies": {
+    "directory-named-webpack-plugin": "^4.0.1"
   }
 }
