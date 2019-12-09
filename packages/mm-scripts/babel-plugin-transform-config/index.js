@@ -29,7 +29,8 @@
  *   ...
  * }
  */
-module.exports = function({ types: t }) {
+module.exports = function(babel) {
+  const t = babel.types;
   t.isIdentifierOrLiteral = (node, name) =>
     t.isIdentifier(node, { name }) || t.isStringLiteral(node, { value: name });
   const buildImport = path =>

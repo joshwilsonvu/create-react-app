@@ -313,9 +313,10 @@ module.exports = function(webpackEnv) {
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
-        // MagicMirror: allow imports from "config" and "modules" without relative paths
+        // MagicMirror: allow imports without relative paths
         config: paths.appConfig,
         modules: paths.appModules,
+        '@mm': paths.appMM, // anything in src/@mm overrides @mm scoped packages in node_modules, eases core development
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -396,6 +397,7 @@ module.exports = function(webpackEnv) {
             },
           ],
           include: paths.appSrc,
+          exclude: paths.appModules, // TODO lint module code
         },
         {
           // "oneOf" will traverse all following loaders until one will
@@ -467,6 +469,14 @@ module.exports = function(webpackEnv) {
                 // See #6846 for context on why cacheCompression is disabled
                 cacheCompression: false,
                 compact: isEnvProduction,
+                overrides: [
+                  {
+                    include: paths.appConfig, // apply transformation to files in config dir (config.js)
+                    plugins: [
+                      require.resolve('../babel-plugin-transform-config'),
+                    ],
+                  },
+                ],
               },
             },
             // Process any JS outside of the app with Babel.
@@ -594,16 +604,16 @@ module.exports = function(webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
-        // Run .js files under modules/ through a custom loader that will detect legacy-style
+        // Run .js files under modules/ through a custom loader that will detect mm2-style
         // MagicMirror modules and convert them into compatible react components.
         {
           test: /\.js$/,
           resolve: {
             symlinks: true,
           },
-          include: path.join(paths.appPath, 'modules'),
+          include: paths.appModules,
           exclude: /node_modules/,
-          loader: require.resolve('mm-utils/legacy-loader'),
+          loader: require.resolve('../mm2-loader'),
         },
       ],
     },
