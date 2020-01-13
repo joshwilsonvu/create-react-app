@@ -29,6 +29,7 @@
  *   ...
  * }
  */
+'use strict';
 module.exports = function(babel) {
   const t = babel.types;
   t.isIdentifierOrLiteral = (node, name) =>
@@ -39,14 +40,6 @@ module.exports = function(babel) {
       t.arrowFunctionExpression(
         [], // params
         t.callExpression(t.import(), [t.stringLiteral(path)])
-      )
-    );
-  const buildRequireResolve = path =>
-    t.objectProperty(
-      t.identifier('_path'),
-      t.callExpression(
-        t.memberExpression(t.identifier('require'), t.identifier('resolve')),
-        [t.stringLiteral(path)]
       )
     );
   return {
@@ -77,9 +70,6 @@ module.exports = function(babel) {
                   moduleName = `modules/${moduleName}`;
                   // insert an _import property with a lazy dynamic import as its value
                   const _import = buildImport(moduleName);
-                  // insert a _path property with the filesystem path to the module as its value
-                  const _path = buildRequireResolve(moduleName);
-                  property.insertAfter(_path);
                   property.insertAfter(_import);
                   break; // don't search through other properties
                 }

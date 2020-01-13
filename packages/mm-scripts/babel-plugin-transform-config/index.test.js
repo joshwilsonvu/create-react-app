@@ -37,7 +37,6 @@ describe('transform', () => {
           {
             module: "helloworld",
             _import: () => import("modules/default/helloworld"),
-            _path: require.resolve("modules/default/helloworld"),
             position: "top_left",
             config: {
               text: "Hello world"
@@ -46,7 +45,6 @@ describe('transform', () => {
           {
             module: "MMM-clock",
             _import: () => import("modules/MMM-clock"),
-            _path: require.resolve("modules/MMM-clock"),
             position: "top_right"
           }
         ]
@@ -62,10 +60,6 @@ describe('transform', () => {
 
   it('contains _import', () => {
     expect(transformed).toContain('_import');
-  });
-
-  it('contains _path', () => {
-    expect(transformed).toContain('_path');
   });
 
   it('matches', () => {
